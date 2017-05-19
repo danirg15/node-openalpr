@@ -32,8 +32,8 @@ class LPRQueueItem
 
 class LPR {
 	public:
-		LPR (std::string configFile = "", std::string runtimePath = "") {
-			this->openalpr = new alpr::Alpr ("us", configFile, runtimePath);
+		LPR (std::string country = "", std::string configFile = "", std::string runtimePath = "") {
+			this->openalpr = new alpr::Alpr (country, configFile, runtimePath);
 			this->openalpr->setTopN (10);
 			this->config = this->openalpr->getConfig ();
 		}
@@ -136,13 +136,14 @@ char *get (v8::Local<v8::Value> value)
 NAN_METHOD (Start)
 {
 	running = true;
-	char *config_path = get (info[0]);
-	char *runtime_path = get (info[1]);
-	int instancesCount = info[2]->NumberValue ();
+	char *country = get (info[0]);
+	char *config_path = get (info[1]);
+	char *runtime_path = get (info[2]);
+	int instancesCount = info[3]->NumberValue ();
 	
 	// Create a list of instances, if any fail to load return false
 	for (int i = 0; i < instancesCount; i++) {
-		LPR *lpr = new LPR (config_path, runtime_path);
+		LPR *lpr = new LPR (country, config_path, runtime_path);
 		if (lpr->isLoaded () == false) {
 			info.GetReturnValue ().Set (false);
 		}
